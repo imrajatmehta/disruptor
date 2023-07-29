@@ -4,16 +4,18 @@ import "sync/atomic"
 
 type Sequence [8]int64 //TODO: Add comments
 
-var defaultSequenceValue int64 = -1
-
 func NewSequence() *Sequence {
-	seq := Sequence{}
-	seq[0] = defaultSequenceValue
-	return &seq
+	seq := &Sequence{}
+	seq[0] = defaultSequence
+	return seq
 }
-func (cur *Sequence) Get() int64 {
-	return atomic.LoadInt64(&cur[0])
+
+func (this *Sequence) Load() int64 {
+	return atomic.LoadInt64(&this[0])
 }
-func (cur *Sequence) Set(data int64) {
-	atomic.StoreInt64(&cur[0], data)
+
+func (this *Sequence) Store(value int64) {
+	atomic.StoreInt64(&this[0], value)
 }
+
+var defaultSequence int64 = -1
