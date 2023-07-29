@@ -8,9 +8,14 @@ import (
 	"github.com/imrajatmehta/disruptor"
 )
 
+func BenchmarkReserveOneOneConsumer(b *testing.B) {
+	benchMarkDisruptor(b, ReserveOne, SampleConsumer{})
+}
+func BenchmarkReserveManyOneConsumer(b *testing.B) {
+	benchMarkDisruptor(b, ReserveMany, SampleConsumer{})
+}
 func BenchmarkReserveOneMultipleConsumer(b *testing.B) {
 	benchMarkDisruptor(b, ReserveOne, SampleConsumer{}, SampleConsumer{})
-
 }
 func BenchmarkReserveManyMultipleConsumer(b *testing.B) {
 	benchMarkDisruptor(b, ReserveMany, SampleConsumer{}, SampleConsumer{})

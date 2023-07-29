@@ -10,12 +10,12 @@ func NewSequence() *Sequence {
 	return seq
 }
 
-func (this *Sequence) Load() int64 {
-	return atomic.LoadInt64(&this[0])
+func (s *Sequence) Load() int64 {
+	return atomic.LoadInt64(&s[0])
 }
 
-func (this *Sequence) Store(value int64) {
-	atomic.StoreInt64(&this[0], value)
+func (s *Sequence) Store(value int64) {
+	atomic.StoreInt64(&s[0], value)
 }
 
 var defaultSequence int64 = -1
