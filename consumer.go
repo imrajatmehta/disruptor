@@ -38,7 +38,7 @@ func (c *Consumer) Read() {
 			c.current.Store(upper)
 			current = upper
 		} else if upper = c.upstream.Load(); lower <= upper {
-			runtime.Gosched() //avoiding continour lookup to producer/upstream cursor as sequence take lock on CPU level, this will help reducing CPU cycle.
+			runtime.Gosched() //avoiding continous lookup to producer/upstream cursor as sequence take lock on CPU level, this will help reducing CPU cycle.
 		} else if atomic.LoadInt64(&c.state) == STATERUNNING { //checking if consumer is in running state.
 			c.waiter.Idle()
 		} else { //consumer is stoped/closed.
