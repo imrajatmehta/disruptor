@@ -32,10 +32,10 @@ Each of the following benchmark tests sends an incrementing sequence message fro
 
 Scenario | Per Operation Time | Bytes per Operation | Allocation per operation
 -------- | ------------------ | ------------------- | ------------------------
-Disruptor: Reserve One & One Consumer | 13.11 ns/op | 0 B/op | 0 allocs/op
-Disruptor: Reserve Many & One Consumer | 1.567 ns/op | 0 B/op | 0 allocs/op
-Disruptor: Reserve One Multiple Consumer | 13.98 ns/op | 0 B/op | 0 allocs/op
-Disruptor: Reserve Many & Multiple Consumer | 1.615 ns/op | 0 B/op | 0 allocs/op
+Disruptor: Reserve One & One Consumer | 8.973 ns/op  | 0 B/op | 0 allocs/op
+Disruptor: Reserve Many & One Consumer | 1.449 ns/op | 0 B/op | 0 allocs/op
+Disruptor: Reserve One Multiple Consumer | 9.656 ns/op | 0 B/op | 0 allocs/op
+Disruptor: Reserve Many & Multiple Consumer | 1.488 ns/op | 0 B/op | 0 allocs/op
 
 No new memory/bytes was assigned in each operation, this is the power of preallocated ring buffer, and considering cache line and Mechanical Sympathy.
 

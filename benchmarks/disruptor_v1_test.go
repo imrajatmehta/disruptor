@@ -5,7 +5,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/imrajatmehta/disruptor"
+	"github.com/imrajatmehta/disruptor/v1"
 )
 
 func BenchmarkReserveOneOneConsumer(b *testing.B) {

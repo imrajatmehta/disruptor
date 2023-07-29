@@ -3,7 +3,7 @@ package main
 import (
 	"sync"
 
-	"github.com/imrajatmehta/disruptor"
+	"github.com/imrajatmehta/disruptor/v1"
 )
 
 func main() {
