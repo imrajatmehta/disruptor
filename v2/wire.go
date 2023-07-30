@@ -55,6 +55,9 @@ func (w *Wireup) validate() error {
 	if w.batchSize < 1 {
 		return errors.New("the batchSize must be at least 1")
 	}
+	if w.batchSize >= w.capacity {
+		return errors.New("the batchSize must be smaller than capacity")
+	}
 	if len(w.consumerGroups) == 0 {
 		return errors.New("the consumer group dont have any consumers")
 	}

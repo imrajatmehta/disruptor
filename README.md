@@ -51,5 +51,5 @@ V2 version contains generic level of disruptor package in which user will only i
 Latency can seen in above Benchmarks.
 
 ## Pending
-1. Implementation for handling multiple data type for publish and consume.
+1. Implementation for handling multiple data type for publish and consume.(use Golang Generic Function)
 2. Support for multiple producers.
