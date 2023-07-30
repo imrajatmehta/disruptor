@@ -19,9 +19,10 @@ In Go, the current implementation of a channel (`chan`) maintains a lock around 
 1. Install latest go lang binary (1.18.3 and above) 
 2. Install latest vs code
 ## Perfomance
-Running all unit test cases in benchmarks
+Running all unit test cases in benchmarks.
 ```Shell
-    go test -v -bench=Benchmark -benchtime=1000000000x -count 3 ./benchmarks
+    go test -v -bench=Benchmark -benchtime=1000000000x -count 3 ./v1/benchmarks
+    go test -v -bench=Benchmark -benchtime=1000000000x -count 3 ./v2/benchmarks
 ```
 Benchmarks
 ----------------------------
@@ -41,3 +42,14 @@ No new memory/bytes was assigned in each operation, this is the power of preallo
 
 ## Example
 Example is implemented in example/main.go
+ 
+## Note
+V1 version contains raw level of code in which user have to create ring buffer on his side and do the publish,commit, reserve, like operations.
+
+V2 version contains generic level of disruptor package in which user will only initialise, publish, recieve the data.
+    If you are new to LMAX Disuptor code will recomment to use v2 version.
+Latency can seen in above Benchmarks.
+
+## Pending
+1. Implementation for handling multiple data type for publish and consume.
+2. Support for multiple producers.
