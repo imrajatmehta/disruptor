@@ -15,10 +15,10 @@ type Consumer struct {
 	upstream       Barrier   // this ring buffer has been writtern up to this sequence or producer current sequence/index/cursor.
 	waiter         Waiter
 	state          int64
-	callerConsumer CustomConsumer //this will given by disruptor package caller, as caller will implementing the Consume(lower,upper) implementation.
+	callerConsumer EventHandler //this will given by disruptor package caller, as caller will implementing the Consume(lower,upper) implementation.
 }
 
-func NewConsumer(current *Sequence, upstream Barrier, callerConsumer CustomConsumer, waiter Waiter) *Consumer {
+func NewConsumer(current *Sequence, upstream Barrier, callerConsumer EventHandler, waiter Waiter) *Consumer {
 	return &Consumer{
 		current:        current,
 		upstream:       upstream,
@@ -27,14 +27,16 @@ func NewConsumer(current *Sequence, upstream Barrier, callerConsumer CustomConsu
 		waiter:         waiter,
 	}
 }
-func (c *Consumer) Read() {
+func (c *Consumer) Read(ringBuffer []int64, mask int64) {
 	var lower, upper int64
 	var current = c.current.Load()
 	for {
 		lower = current + 1
 		upper = c.upstream.Load()
 		if lower <= upper { //Consumer is before producer.
-			c.callerConsumer.Consume(lower, upper)
+			for ; lower <= upper; lower++ {
+				c.callerConsumer.OnEvent(ringBuffer[lower&mask])
+			}
 			c.current.Store(upper)
 			current = upper
 		} else if upper = c.upstream.Load(); lower <= upper {

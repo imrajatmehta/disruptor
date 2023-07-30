@@ -7,54 +7,55 @@ type Option func(*Wireup)
 type Wireup struct {
 	waitStrategy   Waiter
 	capacity       int64
-	consumerGroups [][]CustomConsumer
+	batchSize      int64
+	consumerGroups [][]EventHandler //Having user create custom consumers
 }
 
-func WithCapacity(value int64) Option { return func(this *Wireup) { this.capacity = value } }
-
-func WithConsumerGroups(c ...CustomConsumer) Option {
-	return func(this *Wireup) { this.consumerGroups = append(this.consumerGroups, c) }
+func WithConsumerGroups(c ...EventHandler) Option {
+	return func(w *Wireup) { w.consumerGroups = append(w.consumerGroups, c) }
 }
-
-func WithWaitStrategy(w Waiter) Option { return func(this *Wireup) { this.waitStrategy = w } }
+func WithCapacity(value int64) Option  { return func(w *Wireup) { w.capacity = value } }
+func WithWaitStrategy(w Waiter) Option { return func(w *Wireup) { w.waitStrategy = w } }
+func WithBatchSize(v int64) Option     { return func(w *Wireup) { w.batchSize = v } }
 
 func New(options ...Option) Disruptor {
-	if this, err := NewWireUp(options...); err != nil {
+	if w, err := NewWireUp(options...); err != nil {
 		panic(err)
 	} else {
-		return NewDisruptor(this.build())
+		consumers, producer := w.build()
+		return NewDisruptor(consumers, producer, w.capacity, w.batchSize)
 	}
 }
 func NewWireUp(options ...Option) (*Wireup, error) {
-	this := &Wireup{}
-	WithWaitStrategy(NewWaitStrategy())(this)
+	w := &Wireup{}
+	WithWaitStrategy(NewWaitStrategy())(w)
 	for _, option := range options {
-		option(this)
+		option(w)
 	}
-	if err := this.validate(); err != nil {
+	if err := w.validate(); err != nil {
 		return nil, err
 	}
-	return this, nil
+	return w, nil
 }
 
-func (this *Wireup) build() ([]Reader, Writer) {
+func (w *Wireup) build() ([]Reader, Writer) {
 	writerSequence := NewSequence()
-	consumers, consumerBarrier := this.buildConsumers(writerSequence)
-	return consumers, NewProducer(writerSequence, consumerBarrier, this.capacity)
+	consumers, consumerBarrier := w.buildConsumers(writerSequence)
+	return consumers, NewProducer(writerSequence, consumerBarrier, w.capacity)
 
 }
-func (this *Wireup) validate() error {
+func (w *Wireup) validate() error {
 
-	if this.capacity < 1 {
+	if w.capacity < 1 {
 		return errors.New("the capacity must be at least 1")
 	}
-	if this.capacity&(this.capacity-1) != 0 {
+	if w.capacity&(w.capacity-1) != 0 {
 		return errors.New("the capacity is not a power of 2")
 	}
-	if len(this.consumerGroups) == 0 {
+	if len(w.consumerGroups) == 0 {
 		return errors.New("the consumer group dont have any consumers")
 	}
-	for _, consumerGroup := range this.consumerGroups {
+	for _, consumerGroup := range w.consumerGroups {
 		if len(consumerGroup) == 0 {
 			return errors.New("the consumer group does not have any consumers")
 		}
@@ -67,12 +68,12 @@ func (this *Wireup) validate() error {
 	return nil
 }
 
-func (this *Wireup) buildConsumers(writerSequence *Sequence) (readers []Reader, upstream Barrier) {
+func (w *Wireup) buildConsumers(writerSequence *Sequence) (readers []Reader, upstream Barrier) {
 	var consumerSequences []*Sequence
-	for _, consumerGroup := range this.consumerGroups {
+	for _, consumerGroup := range w.consumerGroups {
 		for _, callerConsumer := range consumerGroup {
 			sequence := NewSequence()
-			readers = append(readers, NewConsumer(sequence, writerSequence, callerConsumer, this.waitStrategy))
+			readers = append(readers, NewConsumer(sequence, writerSequence, callerConsumer, w.waitStrategy))
 			consumerSequences = append(consumerSequences, sequence)
 		}
 		upstream = NewCompositeConsumerBarrier(consumerSequences...)

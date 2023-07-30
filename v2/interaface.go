@@ -4,7 +4,7 @@ import "errors"
 
 // Act as a wall b/w user and consumer functionalities.
 type Reader interface {
-	Read()
+	Read([]int64, int64)
 	Close()
 }
 
@@ -19,9 +19,9 @@ type Barrier interface {
 	Load() int64
 }
 
-// User will provide its custom consumer struct{}, as a input we will take this as this interface so that user will have to implement Consume on its side.
-type CustomConsumer interface {
-	Consume(int64, int64)
+// Interface for user to provide this for sending message to this onEvent fn.
+type EventHandler interface {
+	OnEvent(int64)
 }
 
 type Waiter interface {
