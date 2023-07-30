@@ -14,9 +14,9 @@ type Wireup struct {
 func WithConsumerGroups(c ...EventHandler) Option {
 	return func(w *Wireup) { w.consumerGroups = append(w.consumerGroups, c) }
 }
-func WithCapacity(value int64) Option  { return func(w *Wireup) { w.capacity = value } }
-func WithWaitStrategy(w Waiter) Option { return func(w *Wireup) { w.waitStrategy = w } }
-func WithBatchSize(v int64) Option     { return func(w *Wireup) { w.batchSize = v } }
+func WithCapacity(value int64) Option      { return func(w *Wireup) { w.capacity = value } }
+func WithWaitStrategy(waitS Waiter) Option { return func(w *Wireup) { w.waitStrategy = waitS } }
+func WithBatchSize(v int64) Option         { return func(w *Wireup) { w.batchSize = v } }
 
 func New(options ...Option) Disruptor {
 	if w, err := NewWireUp(options...); err != nil {
@@ -51,6 +51,9 @@ func (w *Wireup) validate() error {
 	}
 	if w.capacity&(w.capacity-1) != 0 {
 		return errors.New("the capacity is not a power of 2")
+	}
+	if w.batchSize < 1 {
+		return errors.New("the batchSize must be at least 1")
 	}
 	if len(w.consumerGroups) == 0 {
 		return errors.New("the consumer group dont have any consumers")
