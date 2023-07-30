@@ -18,6 +18,10 @@ In Go, the current implementation of a channel (`chan`) maintains a lock around 
 ## Prerequisites
 1. Install latest go lang binary (1.18.3 and above) 
 2. Install latest vs code
+## Run Test Case
+```Shell
+    go test
+```
 ## Perfomance
 Running all unit test cases in benchmarks.
 ```Shell
@@ -31,12 +35,16 @@ Each of the following benchmark tests sends an incrementing sequence message fro
 * CPU: `Intel(R) Core(TM) i7-9750H CPU @ 2.60GHz`
 * Go Runtime: `Go 1.20.5`
 
-Scenario | Per Operation Time | Bytes per Operation | Allocation per operation
--------- | ------------------ | ------------------- | ------------------------
-Disruptor: Reserve One & One Consumer | 8.973 ns/op  | 0 B/op | 0 allocs/op
-Disruptor: Reserve Many & One Consumer | 1.449 ns/op | 0 B/op | 0 allocs/op
-Disruptor: Reserve One Multiple Consumer | 9.656 ns/op | 0 B/op | 0 allocs/op
-Disruptor: Reserve Many & Multiple Consumer | 1.488 ns/op | 0 B/op | 0 allocs/op
+Scenario | Per Operation Time | Bytes per Operation | Allocation per operation | Version
+-------- | ------------------ | ------------------- | ------------------------ | --------
+Disruptor: Reserve One & One Consumer | 8.973 ns/op  | 0 B/op | 0 allocs/op | v1
+Disruptor: Reserve Many & One Consumer | 1.449 ns/op | 0 B/op | 0 allocs/op | v1
+Disruptor: Reserve One Multiple Consumer | 9.656 ns/op | 0 B/op | 0 allocs/op | v1
+Disruptor: Reserve Many & Multiple Consumer | 1.488 ns/op | 0 B/op | 0 allocs/op | v1
+Disruptor: Reserve One & One Consumer | 10.403 ns/op  | 0 B/op | 0 allocs/op | v2
+Disruptor: Reserve Many & One Consumer | 2.449 ns/op | 0 B/op | 0 allocs/op | v2
+Disruptor: Reserve One Multiple Consumer | 10.656 ns/op | 0 B/op | 0 allocs/op | v2
+Disruptor: Reserve Many & Multiple Consumer | 2.488 ns/op | 0 B/op | 0 allocs/op | v2
 
 No new memory/bytes was assigned in each operation, this is the power of preallocated ring buffer, and considering cache line and Mechanical Sympathy.
 
@@ -48,7 +56,8 @@ V1 version contains raw level of code in which user have to create ring buffer o
 
 V2 version contains generic level of disruptor package in which user will only initialise, publish, recieve the data.
     If you are new to LMAX Disuptor code will recomment to use v2 version.
-Latency can seen in above Benchmarks.
+
+Latency can seen in above Benchmarks for both the versions.
 
 ## Pending
 1. Implementation for handling multiple data type for publish and consume.(use Golang Generic Function)
