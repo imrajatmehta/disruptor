@@ -2,9 +2,9 @@ package disruptor
 
 import "errors"
 
-type Option func(*Wireup)
+type Option func(*wireup)
 
-type Wireup struct {
+type wireup struct {
 	waitStrategy   Waiter
 	capacity       int64
 	batchSize      int64
@@ -12,22 +12,22 @@ type Wireup struct {
 }
 
 func WithConsumerGroups(c ...EventHandler) Option {
-	return func(w *Wireup) { w.consumerGroups = append(w.consumerGroups, c) }
+	return func(w *wireup) { w.consumerGroups = append(w.consumerGroups, c) }
 }
-func WithCapacity(value int64) Option      { return func(w *Wireup) { w.capacity = value } }
-func WithWaitStrategy(waitS Waiter) Option { return func(w *Wireup) { w.waitStrategy = waitS } }
-func WithBatchSize(v int64) Option         { return func(w *Wireup) { w.batchSize = v } }
+func WithCapacity(value int64) Option      { return func(w *wireup) { w.capacity = value } }
+func WithWaitStrategy(waitS Waiter) Option { return func(w *wireup) { w.waitStrategy = waitS } }
+func WithBatchSize(v int64) Option         { return func(w *wireup) { w.batchSize = v } }
 
-func New(options ...Option) Disruptor {
-	if w, err := NewWireUp(options...); err != nil {
-		panic(err)
+func New(options ...Option) (Disruptor, error) {
+	if w, err := newWireUp(options...); err != nil {
+		return Disruptor{}, err
 	} else {
 		consumers, producer := w.build()
-		return NewDisruptor(consumers, producer, w.capacity, w.batchSize)
+		return NewDisruptor(consumers, producer, w.capacity, w.batchSize), nil
 	}
 }
-func NewWireUp(options ...Option) (*Wireup, error) {
-	w := &Wireup{}
+func newWireUp(options ...Option) (*wireup, error) {
+	w := &wireup{}
 	WithWaitStrategy(NewWaitStrategy())(w)
 	for _, option := range options {
 		option(w)
@@ -38,13 +38,13 @@ func NewWireUp(options ...Option) (*Wireup, error) {
 	return w, nil
 }
 
-func (w *Wireup) build() ([]Reader, Writer) {
+func (w *wireup) build() ([]Reader, Writer) {
 	writerSequence := NewSequence()
 	consumers, consumerBarrier := w.buildConsumers(writerSequence)
 	return consumers, NewProducer(writerSequence, consumerBarrier, w.capacity)
 
 }
-func (w *Wireup) validate() error {
+func (w *wireup) validate() error {
 
 	if w.capacity < 1 {
 		return errors.New("the capacity must be at least 1")
@@ -74,7 +74,7 @@ func (w *Wireup) validate() error {
 	return nil
 }
 
-func (w *Wireup) buildConsumers(writerSequence *Sequence) (readers []Reader, upstream Barrier) {
+func (w *wireup) buildConsumers(writerSequence *Sequence) (readers []Reader, upstream Barrier) {
 	var consumerSequences []*Sequence
 	for _, consumerGroup := range w.consumerGroups {
 		for _, callerConsumer := range consumerGroup {

@@ -22,7 +22,7 @@ func BenchmarkReserveManyMultipleConsumer(b *testing.B) {
 func benchMarkDisruptorBatch(b *testing.B, consumers ...disruptor.EventHandler) {
 	iterations := int64(b.N)
 
-	d := disruptor.New(
+	d, _ := disruptor.New(
 		disruptor.WithCapacity(RingBufferSize),
 		disruptor.WithBatchSize(ReserveMany),
 		disruptor.WithConsumerGroups(consumers...))
@@ -40,7 +40,7 @@ func benchMarkDisruptorBatch(b *testing.B, consumers ...disruptor.EventHandler) 
 func benchMarkDisruptor(b *testing.B, consumers ...disruptor.EventHandler) {
 	iterations := int64(b.N)
 
-	d := disruptor.New(
+	d, _ := disruptor.New(
 		disruptor.WithCapacity(RingBufferSize),
 		disruptor.WithBatchSize(ReserveOne),
 		disruptor.WithConsumerGroups(consumers...))

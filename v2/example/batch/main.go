@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	d := disruptor.New(
+	d, _ := disruptor.New(
 		disruptor.WithCapacity(BUFFERSIZE),
 		disruptor.WithBatchSize(RESERVATION),
 		disruptor.WithConsumerGroups(NewConsumer{}, NewConsumer{}))
